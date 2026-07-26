@@ -16,7 +16,7 @@ Each stage of a feature gets its own clean context and hands the next one a file
 
 ```mermaid
 flowchart LR
-    P("/prototype<br/>can this be built?") -. "if unsure" .-> TD
+    P("/prototype<br/>can this be built?") -. "if confirm" .-> TD
     TD("/create-td<br/><b>design</b>") --> DEV("/dev<br/><b>build</b><br/>🛑 approval gate")
     DEV --> TEST("/test<br/><b>verify</b>")
     TEST --> HO("/handoff<br/><b>ship</b>")
@@ -26,13 +26,13 @@ flowchart LR
 
 ## ✅ Before you start
 
-| | What | Why |
-|:--:|---|---|
-| **Required** | [Claude Code](https://claude.com/claude-code) | These are Claude Code skills. CLI, desktop, web, or IDE extension — any of them. |
-| **Required** | A **git repo** | `/handoff` commits and `/prototype` branches. `/create-td` and `/test` work fine without one. |
-| **Required** | **bash** to run the installer | Native on macOS and Linux; on Windows use WSL or Git Bash. Or skip it and copy the folders by hand. |
-| Recommended | A **`CLAUDE.md`** or **`PRODUCT.md`** | `/create-td` and `/test` read it as your project's source of truth. Without one, `/test` has to ask you what the feature is *supposed* to do. |
-| Optional | **[`gh`](https://cli.github.com)** (GitHub CLI) | Lets `/create-td` read a linked issue and `/handoff` open the PR for you. Both work without it. |
+|              | What                                            | Why                                                                                                                                           |
+| :----------: | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Required** | [Claude Code](https://claude.com/claude-code)   | These are Claude Code skills. CLI, desktop, web, or IDE extension — any of them.                                                              |
+| **Required** | A **git repo**                                  | `/handoff` commits and `/prototype` branches. `/create-td` and `/test` work fine without one.                                                 |
+| **Required** | **bash** to run the installer                   | Native on macOS and Linux; on Windows use WSL or Git Bash. Or skip it and copy the folders by hand.                                           |
+| Recommended  | A **`CLAUDE.md`** or **`PRODUCT.md`**           | `/create-td` and `/test` read it as your project's source of truth. Without one, `/test` has to ask you what the feature is _supposed_ to do. |
+|   Optional   | **[`gh`](https://cli.github.com)** (GitHub CLI) | Lets `/create-td` read a linked issue and `/handoff` open the PR for you. Both work without it.                                               |
 
 **No language or runtime requirements.** The skills detect whatever your project already uses — test
 runner, package manager, commit conventions — and follow it. Nothing to configure.
@@ -88,27 +88,27 @@ cramming an entire program into one giant function. So split it by responsibilit
 > **Narrow context beats large context** — an agent holding one feature's design outperforms one
 > holding your entire repo history. Relevance beats volume.
 >
-> **Checkpoints where they're cheap** — review a task breakdown *before* code exists, not a diff
+> **Checkpoints where they're cheap** — review a task breakdown _before_ code exists, not a diff
 > afterwards. Same mistake, two orders of magnitude difference in cost.
 
 ## 🛠 The five skills
 
-| | Skill | What it does | Writes |
-|:--:|---|---|---|
-| 📐 | **`/create-td`** | Requirements → technical design. Reads your code, writes none of it. | `docs/agent-use/<feature>.md` |
-| 🔨 | **`/dev`** | Design → task breakdown → **your approval** → implementation, parallelised | `…/<feature>.tasks.md` + code |
-| 🧪 | **`/test`** | Tests written from the spec, read *before* the implementation | test files |
-| 📦 | **`/handoff`** | Logical commits + a PR description worth reading | git history + PR body |
-| 🔬 | **`/prototype`** | Throwaway branch answering "can this even be built?" | `…/prototypes/<slug>.md` |
+|     | Skill            | What it does                                                               | Writes                        |
+| :-: | ---------------- | -------------------------------------------------------------------------- | ----------------------------- |
+| 📐  | **`/create-td`** | Requirements → technical design. Reads your code, writes none of it.       | `docs/agent-use/<feature>.md` |
+| 🔨  | **`/dev`**       | Design → task breakdown → **your approval** → implementation, parallelised | `…/<feature>.tasks.md` + code |
+| 🧪  | **`/test`**      | Tests written from the spec, read _before_ the implementation              | test files                    |
+| 📦  | **`/handoff`**   | Logical commits + a PR description worth reading                           | git history + PR body         |
+| 🔬  | **`/prototype`** | Throwaway branch answering "can this even be built?"                       | `…/prototypes/<slug>.md`      |
 
 Every skill has **one job and one line it won't cross.** That's what makes them predictable:
 
-| Skill | The line it won't cross |
-|---|---|
-| 📐 `/create-td` | Won't touch source. Not one line. |
-| 🔨 `/dev` | Won't write code before you approve the breakdown. |
-| 🧪 `/test` | Won't edit a test to make it match buggy code. |
-| 📦 `/handoff` | Won't push or open a PR unasked. |
+| Skill           | The line it won't cross                                        |
+| --------------- | -------------------------------------------------------------- |
+| 📐 `/create-td` | Won't touch source. Not one line.                              |
+| 🔨 `/dev`       | Won't write code before you approve the breakdown.             |
+| 🧪 `/test`      | Won't edit a test to make it match buggy code.                 |
+| 📦 `/handoff`   | Won't push or open a PR unasked.                               |
 | 🔬 `/prototype` | Won't finish without telling you what production really costs. |
 
 ## 🚶 A run through, end to end
@@ -155,7 +155,7 @@ internals.
 /test sso-login
 ```
 
-Reads the acceptance criteria *before* the implementation — deliberately, so the tests describe what
+Reads the acceptance criteria _before_ the implementation — deliberately, so the tests describe what
 the feature **should** do rather than what the code **happens** to do.
 
 When the two disagree, it tells you which one it thinks is wrong instead of quietly bending the test.
