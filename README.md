@@ -1,6 +1,6 @@
 <div align="center">
 
-# Shipping-code skills
+<h1><img src="assets/header.png" alt="Shipping-code skills" width="620"></h1>
 
 **Five skills that stop your Claude Code sessions from forgetting what you asked for.**
 
