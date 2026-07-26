@@ -24,6 +24,22 @@ flowchart LR
 
 <div align="center"><sub><b>↑</b> <code>/dev</code> stops for your approval before it writes a single line of code.</sub></div>
 
+## ✅ Before you start
+
+| | What | Why |
+|:--:|---|---|
+| **Required** | [Claude Code](https://claude.com/claude-code) | These are Claude Code skills. CLI, desktop, web, or IDE extension — any of them. |
+| **Required** | A **git repo** | `/handoff` commits and `/prototype` branches. `/create-td` and `/test` work fine without one. |
+| **Required** | **bash** to run the installer | Native on macOS and Linux; on Windows use WSL or Git Bash. Or skip it and copy the folders by hand. |
+| Recommended | A **`CLAUDE.md`** or **`PRODUCT.md`** | `/create-td` and `/test` read it as your project's source of truth. Without one, `/test` has to ask you what the feature is *supposed* to do. |
+| Optional | **[`gh`](https://cli.github.com)** (GitHub CLI) | Lets `/create-td` read a linked issue and `/handoff` open the PR for you. Both work without it. |
+
+**No language or runtime requirements.** The skills detect whatever your project already uses — test
+runner, package manager, commit conventions — and follow it. Nothing to configure.
+
+> ℹ️ `/dev` parallelises independent tasks across **subagents**, using **git worktrees** when they'd
+> otherwise collide. Both ship with Claude Code and git; there's nothing extra to install.
+
 ## ⚡ Install
 
 ```bash
