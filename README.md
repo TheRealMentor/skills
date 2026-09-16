@@ -16,28 +16,28 @@ Each stage of a feature gets its own clean context and hands the next one a file
 
 ```mermaid
 flowchart LR
-    P("/prototype<br/>can this be built?") -. "if confirm" .-> TD
-    TD("/create-td<br/><b>design</b>") --> DEV("/dev<br/><b>build</b><br/>🛑 approval gate")
-    DEV --> TEST("/test<br/><b>verify</b>")
-    TEST --> HO("/handoff<br/><b>ship</b>")
+    P("/personal:prototype<br/>can this be built?") -. "if confirm" .-> TD
+    TD("/personal:create-td<br/><b>design</b>") --> DEV("/personal:dev<br/><b>build</b><br/>🛑 approval gate")
+    DEV --> TEST("/personal:test<br/><b>verify</b>")
+    TEST --> HO("/personal:handoff<br/><b>ship</b>")
 ```
 
-<div align="center"><sub><b>↑</b> <code>/dev</code> stops for your approval before it writes a single line of code.</sub></div>
+<div align="center"><sub><b>↑</b> <code>/personal:dev</code> stops for your approval before it writes a single line of code.</sub></div>
 
 ## ✅ Before you start
 
 |              | What                                            | Why                                                                                                                                           |
 | :----------: | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Required** | [Claude Code](https://claude.com/claude-code)   | These are Claude Code skills. CLI, desktop, web, or IDE extension — any of them.                                                              |
-| **Required** | A **git repo**                                  | `/handoff` commits and `/prototype` branches. `/create-td` and `/test` work fine without one.                                                 |
+| **Required** | A **git repo**                                  | `/personal:handoff` commits and `/personal:prototype` branches. `/personal:create-td` and `/personal:test` work fine without one.             |
 | **Required** | **bash** to run the installer                   | Native on macOS and Linux; on Windows use WSL or Git Bash. Or skip it and copy the folders by hand.                                           |
-| Recommended  | A **`CLAUDE.md`** or **`PRODUCT.md`**           | `/create-td` and `/test` read it as your project's source of truth. Without one, `/test` has to ask you what the feature is _supposed_ to do. |
-|   Optional   | **[`gh`](https://cli.github.com)** (GitHub CLI) | Lets `/create-td` read a linked issue and `/handoff` open the PR for you. Both work without it.                                               |
+| Recommended  | A **`CLAUDE.md`** or **`PRODUCT.md`**           | `/personal:create-td` and `/personal:test` read it as your project's source of truth. Without one, `/personal:test` has to ask you what the feature is _supposed_ to do. |
+|   Optional   | **[`gh`](https://cli.github.com)** (GitHub CLI) | Lets `/personal:create-td` read a linked issue and `/personal:handoff` open the PR for you. Both work without it.                             |
 
 **No language or runtime requirements.** The skills detect whatever your project already uses — test
 runner, package manager, commit conventions — and follow it. Nothing to configure.
 
-> ℹ️ `/dev` parallelises independent tasks across **subagents**, using **git worktrees** when they'd
+> ℹ️ `/personal:dev` parallelises independent tasks across **subagents**, using **git worktrees** when they'd
 > otherwise collide. Both ship with Claude Code and git; there's nothing extra to install.
 
 ## ⚡ Install
@@ -47,30 +47,31 @@ git clone https://github.com/TheRealMentor/skills.git shipping-skills
 cd shipping-skills && ./install.sh
 ```
 
-Start a new Claude Code session, then type `/create-td`. That's it.
+Start a new Claude Code session, then type `/personal:create-td`. That's it.
 
 <details>
 <summary>Other ways to install</summary>
 
 <br>
 
-**Want editable copies instead of symlinks?**
+**Want an editable copy instead of a symlink?**
 
 ```bash
 ./install.sh --copy
 ```
 
-By default the installer symlinks, so `git pull` here updates your install. `--copy` gives you files
+By default the installer symlinks, so `git pull` here updates your install. `--copy` gives you a copy
 you can freely edit in place.
 
-**Prefer to do it by hand?** There's nothing magic in the script:
+**Prefer to do it by hand?** There's nothing magic in the script — this repo *is* a Claude Code
+plugin (see `.claude-plugin/plugin.json`), so a single symlink at the plugin's name is all it takes:
 
 ```bash
-cp -R skills/* ~/.claude/skills/
-cp agents/* ~/.claude/agents/
+ln -s "$(pwd)" ~/.claude/skills/personal
 ```
 
-Either way it's idempotent, and it will never overwrite a skill you already had by that name.
+Either way it's idempotent, and it will never overwrite something at that path that this script didn't
+put there.
 
 </details>
 
@@ -93,23 +94,23 @@ cramming an entire program into one giant function. So split it by responsibilit
 
 ## 🛠 The five skills
 
-|     | Skill            | What it does                                                               | Writes                        |
-| :-: | ---------------- | -------------------------------------------------------------------------- | ----------------------------- |
-| 📐  | **`/create-td`** | Requirements → technical design. Reads your code, writes none of it.       | `docs/agent-use/<feature>.md` |
-| 🔨  | **`/dev`**       | Design → task breakdown → **your approval** → implementation, parallelised | `…/<feature>.tasks.md` + code |
-| 🧪  | **`/test`**      | Tests written from the spec, read _before_ the implementation              | test files                    |
-| 📦  | **`/handoff`**   | Logical commits + a PR description worth reading                           | git history + PR body         |
-| 🔬  | **`/prototype`** | Throwaway branch answering "can this even be built?"                       | `…/prototypes/<slug>.md`      |
+|     | Skill                     | What it does                                                               | Writes                        |
+| :-: | ------------------------- | --------------------------------------------------------------------------- | ----------------------------- |
+| 📐  | **`/personal:create-td`** | Requirements → technical design. Reads your code, writes none of it.       | `docs/agent-use/<feature>.md` |
+| 🔨  | **`/personal:dev`**       | Design → task breakdown → **your approval** → implementation, parallelised | `…/<feature>.tasks.md` + code |
+| 🧪  | **`/personal:test`**      | Tests written from the spec, read _before_ the implementation              | test files                    |
+| 📦  | **`/personal:handoff`**   | Logical commits + a PR description worth reading                           | git history + PR body         |
+| 🔬  | **`/personal:prototype`** | Throwaway branch answering "can this even be built?"                       | `…/prototypes/<slug>.md`      |
 
 Every skill has **one job and one line it won't cross.** That's what makes them predictable:
 
-| Skill           | The line it won't cross                                        |
-| --------------- | -------------------------------------------------------------- |
-| 📐 `/create-td` | Won't touch source. Not one line.                              |
-| 🔨 `/dev`       | Won't write code before you approve the breakdown.             |
-| 🧪 `/test`      | Won't edit a test to make it match buggy code.                 |
-| 📦 `/handoff`   | Won't push or open a PR unasked.                               |
-| 🔬 `/prototype` | Won't finish without telling you what production really costs. |
+| Skill                    | The line it won't cross                                        |
+| ------------------------ | ---------------------------------------------------------------- |
+| 📐 `/personal:create-td` | Won't touch source. Not one line.                              |
+| 🔨 `/personal:dev`       | Won't write code before you approve the breakdown.             |
+| 🧪 `/personal:test`      | Won't edit a test to make it match buggy code.                 |
+| 📦 `/personal:handoff`   | Won't push or open a PR unasked.                               |
+| 🔬 `/personal:prototype` | Won't finish without telling you what production really costs. |
 
 ## 🚶 A run through, end to end
 
@@ -117,7 +118,7 @@ Every skill has **one job and one line it won't cross.** That's what makes them 
 <summary><b>📐 Design it</b></summary>
 
 ```
-/create-td add SSO login for enterprise accounts
+/personal:create-td add SSO login for enterprise accounts
 ```
 
 Reads your `CLAUDE.md` and the auth code that exists today, asks the one or two questions that would
@@ -134,7 +135,7 @@ Your source tree is untouched. Check `git status` if you don't believe it.
 <summary><b>🔨 Build it</b></summary>
 
 ```
-/dev docs/agent-use/sso-login.md
+/personal:dev docs/agent-use/sso-login.md
 ```
 
 Breaks the design into tasks — each with the files it touches, what it depends on, and a command that
@@ -152,7 +153,7 @@ internals.
 <summary><b>🧪 Verify it</b></summary>
 
 ```
-/test sso-login
+/personal:test sso-login
 ```
 
 Reads the acceptance criteria _before_ the implementation — deliberately, so the tests describe what
@@ -166,7 +167,7 @@ When the two disagree, it tells you which one it thinks is wrong instead of quie
 <summary><b>📦 Ship it</b></summary>
 
 ```
-/handoff
+/personal:handoff
 ```
 
 Splits the branch into commits that actually mean something, writes the PR body, and stops before
@@ -188,7 +189,7 @@ pushing.
 <br>
 
 ```
-/prototype can we stream model output through our existing SSE layer?
+/personal:prototype can we stream model output through our existing SSE layer?
 ```
 
 Throwaway branch, ugliest possible code, and a mandatory verdict at the end: the answer, everything
@@ -231,24 +232,13 @@ the point.
 </details>
 
 <details>
-<summary><b><code>/test</code> and <code>/dev</code> are common words</b></summary>
-
-<br>
-
-Installed at user level, these shadow same-named plugin skills — notably `anthropic-skills:test`.
-
-Rename the directories in `skills/` and re-run the installer if you'd rather keep both.
-
-</details>
-
-<details>
 <summary><b>Skills nudge, they don't enforce</b></summary>
 
 <br>
 
 These describe how to work, and a model can still misjudge one.
 
-The human gate in `/dev` and the mandatory verdict in `/prototype` exist precisely because the two
+The human gate in `/personal:dev` and the mandatory verdict in `/personal:prototype` exist precisely because the two
 moments most worth checking are worth checking **by a person.**
 
 </details>

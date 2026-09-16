@@ -1,0 +1,9 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "personal",
+  "description": "Five skills that stop your Claude Code sessions from forgetting what you asked for.",
+  "skills": "./skills/",
+  "agents": [
+    "./agents/task-implementer.md"
+  ]
+}

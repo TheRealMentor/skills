@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 #
-# Installs the shipping-code skills into ~/.claude.
+# Installs this repo as the "personal" plugin into ~/.claude/skills, so its
+# skills and agent load namespaced (/personal:create-td, /personal:dev, ...).
 #
 #   ./install.sh          symlink (default) — `git pull` here updates your install
-#   ./install.sh --copy   copy instead, if you'd rather edit your copies freely
+#   ./install.sh --copy   copy instead, if you'd rather edit your copy freely
 #
-# Idempotent: re-running refreshes everything it installed before. Anything at a
+# Idempotent: re-running refreshes what it installed before. Anything at the
 # target path that this script didn't put there is left alone and reported.
 
 set -euo pipefail
@@ -13,6 +14,7 @@ set -euo pipefail
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="${CLAUDE_HOME:-$HOME/.claude}"
 MANIFEST="$DEST/.shipping-skills-installed"
+TARGET="$DEST/skills/personal"
 MODE="symlink"
 
 for arg in "$@"; do
@@ -23,69 +25,50 @@ for arg in "$@"; do
   esac
 done
 
-installed=0
-skipped=0
-
-# Paths this script installed on a previous run. Anything else at a target path
-# belongs to the user, and we don't touch it.
-ours() {
-  [ -f "$MANIFEST" ] && grep -qxF "$1" "$MANIFEST"
-}
-
-# install_item <source path> <target path>
-install_item() {
-  local src="$1" target="$2" name
-  name="$(basename "$target")"
-
-  if [ -e "$target" ] || [ -L "$target" ]; then
-    if [ "$MODE" = "symlink" ] && [ -L "$target" ] && [ "$(readlink "$target")" = "$src" ]; then
-      echo "  ok    $name (already linked)"
-      installed=$((installed + 1))
-      return
-    elif ours "$target"; then
-      rm -rf "$target"                      # ours from a previous run — refresh it
-    else
-      echo "  skip  $name — already exists and wasn't installed by this script"
-      skipped=$((skipped + 1))
-      return
-    fi
-  fi
-
-  if [ "$MODE" = "symlink" ]; then
-    ln -s "$src" "$target"
-  else
-    cp -R "$src" "$target"
-  fi
-  echo "$target" >> "$MANIFEST"
-  echo "  ok    $name"
-  installed=$((installed + 1))
-}
-
 echo "Installing into $DEST ($MODE)"
 
-mkdir -p "$DEST/skills" "$DEST/agents"
+mkdir -p "$DEST/skills"
 touch "$MANIFEST"
 
-echo "skills:"
-for skill in "$SRC"/skills/*/; do
-  [ -f "$skill/SKILL.md" ] || continue
-  install_item "${skill%/}" "$DEST/skills/$(basename "${skill%/}")"
-done
+# Earlier versions of this script symlinked each skill (and the agent)
+# straight into ~/.claude/skills and ~/.claude/agents. Those are superseded
+# by the single plugin symlink below — remove whichever of them are still
+# around, but only the ones this script put there.
+while IFS= read -r old; do
+  [ -n "$old" ] || continue
+  [ "$old" = "$TARGET" ] && continue
+  if [ -e "$old" ] || [ -L "$old" ]; then
+    rm -rf "$old"
+    echo "  removed legacy install: $old"
+  fi
+done < "$MANIFEST"
 
-echo "agents:"
-for agent in "$SRC"/agents/*.md; do
-  [ -f "$agent" ] || continue
-  install_item "$agent" "$DEST/agents/$(basename "$agent")"
-done
-
-# Keep the manifest free of duplicates from repeated runs.
-if [ -s "$MANIFEST" ]; then
-  sort -u "$MANIFEST" -o "$MANIFEST"
+if [ -e "$TARGET" ] || [ -L "$TARGET" ]; then
+  if [ "$MODE" = "symlink" ] && [ -L "$TARGET" ] && [ "$(readlink "$TARGET")" = "$SRC" ]; then
+    echo "  ok    personal (already linked)"
+    echo "$TARGET" > "$MANIFEST"
+    echo
+    echo "Start a new Claude Code session, then try /personal:create-td."
+    exit 0
+  elif grep -qxF "$TARGET" "$MANIFEST" 2>/dev/null; then
+    rm -rf "$TARGET"                          # ours from a previous run — refresh it
+  else
+    echo "  skip  personal — $TARGET already exists and wasn't installed by this script"
+    echo
+    echo "Remove it yourself if you want this plugin installed instead."
+    exit 1
+  fi
 fi
+
+if [ "$MODE" = "symlink" ]; then
+  ln -s "$SRC" "$TARGET"
+else
+  mkdir -p "$TARGET"
+  cp -R "$SRC/.claude-plugin" "$SRC/skills" "$SRC/agents" "$TARGET/"
+fi
+echo "  ok    personal"
+
+echo "$TARGET" > "$MANIFEST"
 
 echo
-echo "$installed installed, $skipped skipped."
-if [ "$skipped" -gt 0 ]; then
-  echo "Skipped items already existed — remove them yourself if you want ours instead."
-fi
-echo "Start a new Claude Code session, then try /create-td."
+echo "Start a new Claude Code session, then try /personal:create-td."
