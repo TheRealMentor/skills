@@ -101,7 +101,7 @@ cramming an entire program into one giant function. So split it by responsibilit
 | 🧪  | **`/personal:test`**      | Tests written from the spec, read _before_ the implementation              | test files                    |
 | 📦  | **`/personal:handoff`**   | Logical commits + a PR description worth reading                           | git history + PR body         |
 | 🔬  | **`/personal:prototype`** | Throwaway branch answering "can this even be built?"                       | `…/prototypes/<slug>.md`      |
-| ✍️  | **`/personal:ste-writing`** | Rewrites text in Simplified Technical English — short, clear, hard to misread. | rewritten text |
+| ✍️  | **`/personal:simplify-text`** | Rewrites text in Simplified Technical English — short, clear, hard to misread. | rewritten text |
 
 Every skill has **one job and one line it won't cross.** That's what makes them predictable:
 
