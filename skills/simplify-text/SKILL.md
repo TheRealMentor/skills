@@ -1,9 +1,9 @@
 ---
-name: ste-writing
+name: simplify-text
 description: Rewrite or write text so it is clear, short, and hard to misread, using the principles of Simplified Technical English (ASD-STE100). Use this skill whenever the user wants to simplify, clarify, tighten, "unslop", de-jargon, or make text easier to understand, or when they paste a draft (README, PR description, Slack message, email, spec, runbook, docs, UI copy, prompt or agent instructions) and ask for a rewrite, review, or "make this better". Also use it when writing documentation or instructions from scratch for readers who may not be native English speakers, and when text sounds bloated, vague, or AI-generated. Trigger even if the user never says "STE" or "simple English".
 ---
 
-# STE Writing
+# Simplify Text
 
 Make text easy to understand on the first read. This skill borrows the core ideas of ASD-STE100 (Simplified Technical English) and adapts them for everyday professional writing. It is not a certification checker. The goal is a reader who gets the point fast and cannot misread it.
 
